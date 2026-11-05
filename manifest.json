@@ -1,0 +1,13 @@
+{
+  "name": "메뉴암기",
+  "short_name": "메뉴암기",
+  "description": "메가커피 메뉴 제조법 암기 앱",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FBF4EC",
+  "theme_color": "#2E6B4F",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

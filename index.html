@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메뉴암기</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2E6B4F">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
+<style>
+  :root{
+    --bg:#FBF4EC; --card:#FFFFFF; --line:#E8DAC8;
+    --ink:#3B2415; --ink-soft:#6B4423; --muted:#9C8770;
+    --accent:#2E6B4F; --accent-soft:#E4EFE8;
+    --caramel:#C97B3D; --caramel-soft:#FBEADA;
+    --bad:#C0392B; --bad-soft:#FBE4E1;
+    --good:#2E6B4F; --good-soft:#E4EFE8;
+    --shadow:0 1px 2px rgba(59,36,21,.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Malgun Gothic",Pretendard,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    position:sticky; top:0; z-index:20; background:var(--bg);
+    border-bottom:1px solid var(--line); padding:8px 12px 0;
+  }
+  h1{font-size:16px; margin:2px 4px 8px; color:var(--ink);}
+
+  nav.tabs{display:flex; gap:12px; overflow-x:auto; align-items:flex-start;}
+  .taggroup{display:flex; flex-direction:column; gap:3px; flex:none;}
+  .taggroup-label{font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; padding-left:3px;}
+  .taggroup-btns{display:flex; gap:3px;}
+  nav.tabs button{
+    flex:none; min-width:64px; border:none; background:transparent; color:var(--ink-soft);
+    padding:9px 6px 10px; font-size:12.5px; font-weight:600; cursor:pointer;
+    border-bottom:3px solid transparent; white-space:nowrap;
+  }
+  nav.tabs button.active{color:var(--accent); border-bottom-color:var(--accent);}
+
+  .modebar{display:flex; align-items:center; gap:8px; padding:7px 2px 8px; font-size:11px; color:var(--muted);}
+  .seg2{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden;}
+  .seg2 button{border:none; background:#fff; color:var(--ink-soft); font-size:11px; padding:5px 11px; cursor:pointer;}
+  .seg2 button.active{background:var(--ink); color:#fff;}
+
+  main{max-width:900px; width:94%; margin:0 auto; padding:12px 0 80px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow);}
+  .rule-box{padding:12px 14px; margin-bottom:12px; font-size:12.5px; line-height:1.65; color:var(--ink-soft);}
+  .rule-box b{color:var(--ink);}
+
+  .filterbar{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .chip{
+    border:1px solid var(--line); background:#fff; color:var(--ink-soft); border-radius:999px;
+    padding:6px 11px; font-size:12px; cursor:pointer; user-select:none;
+  }
+  .chip.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .chip.pop{border-color:var(--caramel);}
+  .chip.pop.on{background:var(--caramel); border-color:var(--caramel);}
+  .filtertoggle{font-weight:700;}
+  .toolrow{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:var(--muted); flex-wrap:wrap;}
+  .toolrow .cnt{font-weight:700; color:var(--ink-soft);}
+  .linkbtn{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:2px;}
+
+  .cat-block{margin-bottom:16px;}
+  .cat-head{font-size:14px; font-weight:700; color:var(--ink); margin:0 0 6px 2px; display:flex; align-items:center; gap:6px;}
+  .cat-head .n{font-size:11px; color:var(--muted); font-weight:400;}
+
+  .item{border:1px solid var(--line); border-radius:10px; background:#fff; margin-bottom:7px; overflow:hidden;}
+  .item.done{opacity:.5;}
+  .item-head{display:flex; align-items:center; gap:6px; padding:10px 10px; cursor:pointer;}
+  .item-head .star{font-size:16px; color:var(--line); cursor:pointer; flex:none;}
+  .item-head .star.on{color:var(--caramel);}
+  .item-head .namewrap{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;}
+  .item-head .name{font-size:14px; font-weight:600;}
+  .item-head .oneliner{font-size:11px; color:var(--muted); font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .item-head .cup{font-size:11px; color:#fff; background:var(--accent); border-radius:6px; padding:2px 6px; flex:none;}
+  .item-head .arrow{color:var(--muted); font-size:11px; flex:none;}
+  .item-head .iconbtn{
+    flex:none; font-size:12px; border:1px solid var(--line); background:var(--bg);
+    color:var(--ink-soft); border-radius:7px; padding:4px 7px; cursor:pointer;
+  }
+  .item-head .donebtn.on{background:var(--good-soft); border-color:var(--good); color:var(--good);}
+  .item-body{padding:2px 12px 12px; font-size:12.5px; line-height:1.7; display:none;}
+  .item-body.open{display:block;}
+  .steps{display:flex; flex-wrap:wrap; gap:5px; margin:4px 0 8px;}
+  .step{background:var(--accent-soft); color:var(--accent); border-radius:6px; padding:3px 8px; font-size:12px;}
+  .step[data-i]::before{content:attr(data-i)"."; margin-right:3px; font-weight:700;}
+  .step.skip{background:var(--bg); color:var(--muted); opacity:.6; text-decoration:line-through;}
+  .kv{display:grid; grid-template-columns:auto 1fr; gap:4px 8px; margin-bottom:3px;}
+  .kv b{color:var(--ink-soft); font-weight:700;}
+  .sub{margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); color:var(--muted); font-size:11.5px;}
+  .memo{margin-top:6px; font-size:11.5px; color:var(--ink-soft); background:var(--accent-soft); border-radius:8px; padding:6px 9px;}
+
+  .qcard{padding:18px 16px; text-align:center;}
+  .qcat{font-size:11px; color:var(--muted); margin-bottom:6px;}
+  .qname{font-size:20px; font-weight:800; margin:4px 0 2px;}
+  .qcup{display:inline-block; font-size:11px; color:#fff; background:var(--accent); border-radius:6px; padding:2px 7px; margin-top:6px;}
+  .qprompt{margin-top:10px; font-size:12px; color:var(--muted);}
+
+  .flip-wrap{perspective:1000px; margin-bottom:14px;}
+  .flip-card{position:relative; min-height:210px; cursor:pointer;}
+  .flip-face{border:1px solid var(--line); border-radius:14px; background:#fff; padding:18px 16px; min-height:210px; display:flex; flex-direction:column; justify-content:center;}
+  .flip-face.back{text-align:left; justify-content:flex-start; display:none;}
+  .flip-face.back.show{display:flex;}
+  .flip-face.front.hide{display:none;}
+  .flip-hint{position:absolute; bottom:10px; right:14px; font-size:11px; color:var(--muted);}
+
+  .btnrow{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .btn{flex:1; border:none; border-radius:10px; padding:12px 8px; font-size:13px; font-weight:700; cursor:pointer; min-width:120px;}
+  .btn.primary{background:var(--accent); color:#fff;}
+  .btn.ghost{background:#fff; border:1px solid var(--line); color:var(--ink-soft);}
+  .btn.warn{background:var(--bad-soft); color:var(--bad); border:1px solid #f0c9c3;}
+  .btn.good{background:var(--good-soft); color:var(--good); border:1px solid #bfe0cd;}
+  .btn:disabled{opacity:.4; cursor:default;}
+
+  .mc-mode{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .mc-mode button{flex:1 1 30%; padding:8px 4px; border-radius:9px; border:1px solid var(--line); background:#fff; font-size:12px; font-weight:700; color:var(--ink-soft); cursor:pointer;}
+  .mc-mode button.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .options{display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+  .opt{
+    border:1px solid var(--line); background:#fff; border-radius:10px; padding:11px 12px;
+    text-align:left; font-size:13px; line-height:1.6; cursor:pointer; color:var(--ink);
+  }
+  .opt b{display:block; font-size:14px; margin-bottom:2px;}
+  .opt.correct{background:var(--good-soft); border-color:var(--good);}
+  .opt.wrong{background:var(--bad-soft); border-color:var(--bad);}
+  .opt.disabled{opacity:.45; pointer-events:none;}
+  .score{font-size:12px; color:var(--muted); text-align:right; margin-bottom:6px;}
+  .drillmsg{border-radius:9px; padding:9px 11px; font-size:12px; margin-top:10px; line-height:1.6; font-weight:600;}
+  .drillmsg.ok{background:var(--good-soft); color:var(--good);}
+  .drillmsg.bad{background:var(--bad-soft); color:var(--bad);}
+
+  .empty{text-align:center; color:var(--muted); font-size:13px; padding:40px 10px;}
+  footer.credit{text-align:center; color:var(--muted); font-size:11px; padding:20px 0 4px;}
+
+  /* editor */
+  .editbox{border:2px solid var(--accent); border-radius:12px; background:#fff; padding:14px; margin-bottom:14px;}
+  .editbox h3{margin:0 0 10px; font-size:14px; color:var(--accent);}
+  .field{margin-bottom:10px;}
+  .field label{display:block; font-size:11px; color:var(--muted); margin-bottom:3px; font-weight:700;}
+  .field input, .field select, .field textarea{
+    width:100%; border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; background:var(--bg); color:var(--ink);
+    font-family:inherit;
+  }
+  .field textarea{resize:vertical; min-height:50px;}
+  .steprow{border:1px solid var(--line); border-radius:9px; padding:8px; margin-bottom:8px; background:var(--bg);}
+  .steprow-top{display:flex; gap:6px; align-items:center; margin-bottom:6px;}
+  .steprow-top input{flex:1;}
+  .pairrow{display:flex; gap:6px; margin-bottom:4px; align-items:center;}
+  .pairrow input{flex:1; padding:6px 8px; font-size:12px;}
+  .tinybtn{border:1px solid var(--line); background:#fff; border-radius:6px; padding:4px 8px; font-size:11px; cursor:pointer; color:var(--ink-soft); flex:none;}
+  .tinybtn.danger{color:var(--bad); border-color:#f0c9c3;}
+  .skiptoggle{border:1px solid var(--line); border-radius:999px; padding:3px 10px; font-size:11px; cursor:pointer; flex:none;}
+  .skiptoggle.included{background:var(--accent-soft); color:var(--accent); border-color:var(--accent);}
+  .skiptoggle.skipped{background:var(--bg); color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>메뉴암기</h1>
+  <nav class="tabs">
+    <div class="taggroup">
+      <span class="taggroup-label">공부</span>
+      <div class="taggroup-btns">
+        <button data-tab="list" class="active">📋 목록</button>
+        <button data-tab="card">🎴 카드</button>
+      </div>
+    </div>
+    <div class="taggroup">
+      <span class="taggroup-label">문제</span>
+      <div class="taggroup-btns">
+        <button data-tab="drill">🎯 문제풀이</button>
+        <button data-tab="speed">⚡ 스피드</button>
+      </div>
+    </div>
+  </nav>
+  <div class="modebar">
+    <span>제조과정</span>
+    <div class="seg2" id="stepModeSeg">
+      <button data-stepmode="full" class="active">전체보기</button>
+      <button data-stepmode="summary">요약보기</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- LIST -->
+  <div class="panel active" id="panel-list">
+    <div id="itemFormHost"></div>
+
+    <div class="filterbar" id="catFilterBar"></div>
+    <div class="filterbar">
+      <span class="chip" id="fltUnstudied">🙈 안 외운 것만</span>
+      <span class="chip pop" id="fltPopular">⭐ 인기메뉴만</span>
+      <button class="linkbtn" id="selAll">전체선택</button>
+      <button class="linkbtn" id="selNone">전체해제</button>
+    </div>
+    <div class="toolrow">
+      <span>표시중 <span class="cnt" id="listCount">0</span>개 · 외운 것 <span class="cnt" id="doneCount">0</span>개</span>
+      <button class="linkbtn" id="resetDone">전체 다시 학습으로</button>
+      <button class="btn primary" style="flex:none; padding:8px 14px;" id="addItemBtn">➕ 메뉴 추가</button>
+    </div>
+
+    <div id="listRoot"></div>
+  </div>
+
+  <!-- CARD -->
+  <div class="panel" id="panel-card">
+    <div class="filterbar" id="cardFilterInfo"></div>
+    <div class="score" id="cardProgress"></div>
+    <div class="flip-wrap">
+      <div class="flip-card card" id="flipCard">
+        <div class="flip-face front" id="cardFront">
+          <div class="qcard">
+            <div class="qcat" id="cardCat">-</div>
+            <div class="qname" id="cardName">-</div>
+            <div class="qcup" id="cardCup"></div>
+          </div>
+        </div>
+        <div class="flip-face back" id="cardBack"></div>
+        <div class="flip-hint">탭하면 뒤집힙니다 🔄</div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="btn good" id="cardRight">✅ 외웠음</button>
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" id="cardShuffle">🔀 섞기</button>
+      <button class="btn ghost" id="cardNext">다음 ▶</button>
+    </div>
+  </div>
+
+  <!-- DRILL -->
+  <div class="panel" id="panel-drill">
+    <div class="filterbar"><button class="chip filtertoggle">✅ 목록 필터 적용중</button></div>
+    <div class="mc-mode" id="drillQBar">
+      <button class="active" data-qtype="ingredient">🧪 재료 맞추기</button>
+      <button data-qtype="amount">⚖️ 양 맞추기</button>
+      <button data-qtype="order">🧭 과정 맞추기</button>
+    </div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:2px 0 10px;">
+    <div class="mc-mode" id="drillRunBar">
+      <button class="active" data-drillrun="mc">🔘 연습문제</button>
+      <button data-drillrun="one">하나만 드릴</button>
+      <button data-drillrun="all">전체 드릴</button>
+    </div>
+    <div class="score" id="drillStatus"></div>
+    <div class="card qcard" id="drillQuestionBox">
+      <div id="drillQuestion"></div>
+    </div>
+    <div class="options" id="drillOptions"></div>
+    <div class="drillmsg" id="drillMsg" style="display:none;"></div>
+    <div class="btnrow">
+      <button class="btn primary" id="drillNext" style="display:none;">다음 메뉴로 ▶</button>
+    </div>
+  </div>
+
+  <!-- SPEED -->
+  <div class="panel" id="panel-speed">
+    <div class="filterbar"><button class="chip filtertoggle">✅ 목록 필터 적용중</button></div>
+    <div class="score" id="speedScore">0 / 0</div>
+    <div class="card qcard" id="speedQuestionBox">
+      <div id="speedQuestion"></div>
+    </div>
+    <div class="options" id="speedOptions"></div>
+    <div class="btnrow">
+      <button class="btn primary" id="speedNext">다음 문제 ▶</button>
+    </div>
+  </div>
+
+</main>
+<footer class="credit">데모 v3 · 메뉴 직접 추가/수정 가능</footer>
+
+<script>
+(function(){
+"use strict";
+
+function mk(name, order, cup, shot, ice, liquid, ingredient, topping, blender, tip){
+  return {name, order, cup:cup||'', shot:shot||'', ice:ice||'', liquid:liquid||'', ingredient:ingredient||'', topping:topping||'', blender:blender||'', tip:tip||''};
+}
+
+const CATEGORIES = [
+{key:'hotCoffee', label:'핫커피', icon:'☕',
+ items:[
+  mk('아메리카노','추출 컵 액상 샷','20','2','','자동','',''),
+  mk('꿀아메리카노','샷잔(재료) 추출 컵 액상 샷잔·샷 섞어투입','20','2','','자동','꿀2',''),
+  mk('헛개리카노','추출 컵(재료) 액상 섞기 샷투입','20','2','','자동','헛개베이스3',''),
+  mk('헤이즐넛아메리카노','추출 컵(재료) 액상 섞기 샷투입','20','2','','자동','헤이즐넛시럽3',''),
+  mk('바닐라아메리카노','추출 컵(재료) 액상 섞기 샷투입','20','2','','자동','바닐라시럽3',''),
+  mk('카페라떼','추출 스팀 컵 샷투입 액상','20','2','','스팀우유275','',''),
+  mk('카푸치노','추출 스팀 컵 샷투입 액상 토핑','20','2','','스팀우유275','','시나몬파우더'),
+  mk('카라멜마끼야또','추출 컵(재료) 스팀 액상 섞기 샷투입 토핑','20','2','','스팀우유250','카라멜시럽3','카라멜드리즐','','순서 고정 : 카라멜시럽 → 스팀 → 샷 → 카라멜드리즐'),
+  mk('헤이즐넛라떼','추출 컵(재료) 스팀 샷 섞기 액상','20','2','','스팀우유250','헤이즐넛시럽3',''),
+  mk('바닐라라떼','추출 컵(재료) 스팀 샷 섞기 액상','20','2','','스팀우유250','바닐라시럽3',''),
+  mk('연유라떼','샷잔(재료) 추출 스팀 컵(샷잔·샷 섞고 투입) 액상','20','2','','스팀우유250','연유2 슈가시럽1',''),
+  mk('카페모카','추출 컵(재료, 샷 투입 후 섞기) 스팀 액상','20','2','','스팀우유250','초코파우더2','휘핑 + 초코드리즐','','카페모카 = 초코 + 휘핑 (유일한 휘핑 메뉴)'),
+ ]},
+{key:'icedCoffee', label:'아이스커피', icon:'🧊',
+ items:[
+  mk('아메리카노','추출 컵 얼음액상 샷','24','2','가득','자동','',''),
+  mk('메가리카노','추출 컵 얼음액상 샷','32','3','가득','자동','',''),
+  mk('헛개리카노','추출 컵(재료) 얼음액상 샷 섞기','24','2','가득','자동','헛개베이스3',''),
+  mk('왕메가헛개리카노','추출 컵(재료) 얼음액상 샷 섞기','32','3','가득','자동','헛개베이스5',''),
+  mk('꿀아메리카노','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입 섞기','24','2','가득','자동','꿀2',''),
+  mk('헤이즐넛아메리카노','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입 섞기','24','2','가득','자동','헤이즐넛시럽4',''),
+  mk('바닐라아메리카노','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입 섞기','24','2','가득','자동','바닐라시럽4',''),
+  mk('카페라떼(8부)','추출 컵(얼음액상) 샷','20','2','가득','우유8부','',''),
+  mk('헤이즐넛라떼(a선)','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입 섞기','20','2','가득','우유a선','헤이즐넛시럽4',''),
+  mk('바닐라라떼(a선)','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입 섞기','20','2','가득','우유a선','바닐라시럽4',''),
+  mk('라이트바닐라아몬드라떼(a선)','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입','20','2','가득','아몬드밀크a선','라이트바닐라시럽4',''),
+  mk('연유라떼(a선)','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입','20','2','가득','우유a선','연유2',''),
+  mk('큐브라떼(a선)','샷잔(재료) 추출 컵(얼음액상) 재료·샷 섞고투입 토핑','20','2','컵선','우유a선','연유2','에스프레소큐브2','','연유라떼 + 토핑'),
+  mk('카페모카(a선)','추출 컵(재료) 얼음액상 샷 섞기 토핑','20','2','컵선','우유a선','초코베이스 컵밑선','일반휘핑30 + 초코드리즐','','모카는 초코다 (카페라떼 + 휘핑)'),
+  mk('초코젤라또 말차라떼(8부)','추출 컵(재료) 얼음액상 섞기 초코드리즐(컵선까지) 샷 토핑','20','2','컵선','우유8부','녹차베이스 컵밑선','초코드리즐+초코젤라또','','말차라떼 + 초코/샷/초코'),
+  mk('카푸치노(b선)','우유거품200 추출 컵(얼음액상) 샷 우유거품 토핑','20','2','컵선','우유b선','','시나몬파우더','','카페라떼 + 거품 (아이스든 핫이든 동일)'),
+  mk('카라멜마끼아또(b선)','우유거품200 샷잔(재료) 추출 컵(얼음액상) 우유거품 샷잔 토핑','20','2','컵선','우유b선','카라멜시럽4','카라멜드리즐','','순서 고정 : 액상 → 거품 → 샷 → 토핑'),
+  mk('할메가커피','컵(얼음) 재료','20','','가득','','할메가커피베이스300',''),
+  mk('할메가미숫커피','블렌더(액상,재료) 믹싱 컵(얼음) 재료','20','','가득','','할메가커피베이스300 곡물파우더3',''),
+ ]},
+{key:'hotTea', label:'핫티', icon:'🍵',
+ items:[
+  mk('얼그레이','컵(재료) 액상','20','','','온수 자동','티1',''),
+  mk('녹차','컵(재료) 액상','20','','','온수 자동','티1',''),
+  mk('캐모마일','컵(재료) 액상','20','','','온수 자동','티1',''),
+  mk('페퍼민트','컵(재료) 액상','20','','','온수 자동','티1',''),
+  mk('유자차','컵(재료) 액상 섞기','20','','','온수 자동','유자청5',''),
+  mk('레몬차','컵(재료) 액상 섞기 토핑','20','','','온수 자동','레몬청5','레몬슬라이스'),
+  mk('자몽차','컵(재료) 액상 섞기 토핑','20','','','온수 자동','자몽청4 슈가시럽2','자몽슬라이스(4등분)'),
+  mk('유자생강차','컵(재료) 액상 섞기 토핑','20','','','온수 자동','유자청4 생강베이스8','레몬슬라이스','','생강베이스8 (화끈하네) · 토핑은 레몬슬라이스'),
+  mk('허니자몽블랙티','컵(재료) 액상 섞기 티백 토핑','20','','','온수 자동','자몽청3+꿀1 / 얼그레이티백1','자몽슬라이스(4등분)','','자몽(3+1) + 얼그레이'),
+  mk('사과유자티','컵(재료) 액상 섞기 티백','20','','','온수 자동','유자청4 / 애플티백1','','','사과 + 유자(4)'),
+ ]},
+{key:'icedTea', label:'아이스티', icon:'🧋',
+ items:[
+  mk('얼그레이','계량컵(재료) 컵(얼음 반컵) 재료투입 얼음 액상 토핑','24','','가득','자동','온수150 티백2','애플민트'),
+  mk('녹차','계량컵(재료) 컵(얼음 반컵) 재료투입 얼음 액상 토핑','24','','가득','자동','온수150 티백2','애플민트'),
+  mk('캐모마일','계량컵(재료) 컵(얼음 반컵) 재료투입 얼음 액상 토핑','24','','가득','자동','온수150 티백2','애플민트'),
+  mk('페퍼민트','계량컵(재료) 컵(얼음 반컵) 재료투입 얼음 액상 토핑','24','','가득','자동','온수150 티백2','애플민트'),
+  mk('유자차','컵(재료) 섞기 얼음액상 섞기 토핑','24','','가득','자동','유자청6 온수50','애플민트'),
+  mk('레몬차','컵(재료) 섞기 얼음액상 섞기 토핑','24','','가득','자동','레몬청6 온수50','애플민트 레몬슬라이스'),
+  mk('자몽차','컵(재료) 섞기 얼음액상 섞기 토핑','24','','가득','자동','자몽청4 슈가시럽1 온수50','애플민트 자몽슬라이스'),
+  mk('상큼리치티','컵(재료1) 얼음액상 컵(재료2) 섞기 토핑','24','','가득','자동','리치베이스(컵밑선) / 냉동레드커런트1','로즈마리'),
+  mk('허니자몽블랙티','계량컵(재료) 컵(재료-우린물도!) 섞기 얼음액상 섞기','24','','가득','자동','얼그레이1 온수75 / 자몽청3 꿀1','애플민트 자몽슬라이스'),
+  mk('사과유자티','계량컵(재료) 컵(재료-우린물도!) 섞기 얼음액상 섞기 토핑','24','','가득','자동','사과티백1 온수75 / 유자청4',''),
+  mk('복숭아아이스티','컵(재료) 얼음액상 섞기 토핑','24','','가득','자동','아이스티베이스(z선)','애플민트'),
+  mk('왕메가아이스티','컵(재료) 얼음액상 섞기 토핑','32','','가득','자동','아이스티베이스(i선)','애플민트'),
+  mk('제로복숭아아이스티','컵(재료=제로시럽5) 얼음액상 섞기 토핑','24','','가득','자동','제로슈가아이스티시럽5','애플민트'),
+ ]},
+{key:'hotLatte', label:'핫라떼', icon:'🫖',
+ items:[
+  mk('녹차라떼','컵(재료) 온수50 섞기 스팀 액상 토핑','20','','','스팀우유250','녹차파우더2','녹차파우더'),
+  mk('로얄밀크티','컵(재료) 온수50 섞기 스팀 액상','20','','','스팀우유250','홍차파우더2','','','로얄밀크티 = 홍차'),
+  mk('핫초코','컵(재료) 온수50 섞기 스팀 액상 토핑','20','','','스팀우유250','초코파우더4','코코아파우더'),
+  mk('토피넛라떼','컵(재료) 온수50 섞기 스팀 액상 토핑','20','','','스팀우유250','토피넛파우더4','카라멜드리즐'),
+  mk('고구마라떼','컵(재료) 액상 섞기 거품 토핑','20','','','스팀우유275','고구마페이스트1 슈가시럽1','아몬드슬라이스'),
+  mk('곡물라떼','컵(재료) 액상 섞기 거품 토핑','20','','','스팀우유275','곡물파우더4 슈가시럽1','아몬드슬라이스'),
+ ]},
+{key:'icedLatte', label:'아이스라떼', icon:'🥤',
+ items:[
+  mk('녹차라떼','컵(재료) 얼음액상 섞기','20','','가득','우유가득','녹차베이스 컵밑선',''),
+  mk('아이스초코','컵(재료) 얼음액상 섞기','20','','가득','우유가득','초코베이스 d선',''),
+  mk('왕메가초코','컵(재료) 얼음액상 섞기','32','','가득','우유가득','초코베이스 I선',''),
+  mk('딸기라떼','컵(재료, 가위컷팅) 얼음액상 섞기','20','','가득','우유가득','가당딸기200ml 슈가시럽3','','','재료를 가위로 컷팅'),
+  mk('곡물라떼','블렌더(액상250,재료) 컵(얼음) 붓기','20','','가득','우유250','곡물파우더4 슈가시럽1','','3번'),
+  mk('토피넛라떼','블렌더(액상250,재료) 컵(얼음) 붓기','20','','가득','우유250','토피넛파우더4','','3번'),
+  mk('고구마라떼','블렌더(액상200,재료) 컵(얼음) 붓기','20','','가득','우유200','고구마페이스트1 슈가시럽1','','3번'),
+  mk('로얄밀크티','블렌더(액상200,재료) 컵(얼음) 붓기','20','','가득','우유200','홍차파우더2','','3번','로얄밀크티 = 홍차'),
+  mk('오레오초코라떼','블렌더(액상200,재료) 컵(얼음) 흔들고붓기','20','','컵선','우유200','초코베이스50 오레오과자3','휘핑 오레오1 쿠키분태','3번','블렌더는 5초만 · 휘핑 올릴 거라 얼음은 컵선까지만'),
+ ]},
+{key:'ade', label:'에이드', icon:'🍋',
+ items:[
+  mk('체리콜라','컵(재료) 얼음액상 섞기 토핑','24','','가득','콜라','체리베이스 컵밑선','애플민트'),
+  mk('레몬에이드','컵(재료) 얼음액상 섞기 토핑','24','','가득','사이다','레몬퓨레1.5 슈가시럽1','애플민트 레몬슬라이스'),
+  mk('블루레몬에이드','컵(재료) 얼음액상 섞기 토핑','24','','가득','사이다','레몬퓨레1.5 블루큐라소시럽2','애플민트 레몬슬라이스'),
+  mk('자몽에이드','컵(재료) 얼음액상 섞기 토핑','24','','가득','사이다','자몽퓨레1 자몽시럽1 슈가시럽1','애플민트 자몽슬라이스'),
+  mk('청포도에이드','컵(재료) 얼음액상 섞기 토핑','24','','가득','사이다','청포도퓨레2 라임퓨레1','애플민트'),
+  mk('제로부스트에이드','컵(재료) 얼음액상 섞기','24','','가득','제로사이다','부스터베이스1.5 레몬슬라이스1','x'),
+  mk('메가에이드','컵(재료) 빻기 얼음액상 섞기 토핑','24','','가득','사이다','메가에이드베이스2 자몽슬라이스1 레몬슬라이스2 라임슬라이스2','애플민트','','자몽슬라이스는 4등분'),
+  mk('라임모히또','컵(재료) 빻기 얼음액상 섞기 토핑','24','','가득','사이다','라임시럽3 모히또시럽4 라임슬라이스4 애플민트4','x'),
+ ]},
+{key:'frappe', label:'스무디·프라페', icon:'🍧',
+ items:[
+  mk('플레인요거트스무디','블렌더(재료얼음액상) 컵 붓기','20','','가득','우유200','요거트파우더6 시럽1','','3번'),
+  mk('망고요거트스무디','블렌더(재료얼음액상) 컵 붓기','20','','가득','우유150','요거트파우더3 골드망고베이스1 해동망고10','','3번'),
+  mk('딸기요거트스무디','블렌더(재료얼음액상) 컵 붓기','20','','가득','우유150','요거트파우더3 가당딸기150 슈가시럽1','','3번'),
+  mk('블루베리요거트스무디','블렌더(재료얼음액상) 컵(재료2) 붓기','20','','가득','우유150','요거트파우더3 블루베리베이스3 슈가시럽1 / 블루베리베이스 덕지덕지','','3번'),
+  mk('골드망고스무디','블렌더(재료얼음액상) 컵 붓기','20','','약간 더','정수150','골드망고베이스3.5 해동망고5','','3번'),
+  mk('귤톡톡젤리스무디','블렌더(재료얼음액상) 컵(재료2) 붓기 토핑','20','','가득','정수150','귤베이스5 슈가시럽1 / 감귤워터젤리 컵밑선','애플민트','3번'),
+  mk('코코넛커피스무디','블렌더(재료,얼음) 컵(식힌샷50) 붓기 토핑','20','','가득','x','코코넛베이스250 코코넛칩1 / 컵바닥 식힌샷50','코코넛칩1','3번','완전 독립적인 메뉴'),
+  mk('밀크쉐이크','블렌더(재료얼음액상) 컵 붓기','20','','가득','우유200','밀크쉐이크파우더5','','3번'),
+  mk('쿠키프라페','블렌더(재료얼음) 컵(재료2) 붓기','20','','가득','x','쿠키베이스250 쿠키분태3 / 쿠키분태1 컵바닥','휘핑30 오레오2 쿠키분태','3번'),
+  mk('리얼초코프라페','블렌더(재료얼음) 컵 붓기','20','','가득','x','쿠키베이스100 초코베이스150 초코칩1','휘핑30 초코·카라멜드리즐 딸기분태','3번'),
+  mk('녹차프라페','블렌더(재료얼음) 컵 붓기','20','','가득','x','쿠키베이스125 녹차베이스125','휘핑30 녹차파우더','3번'),
+  mk('커피프라페','블렌더(재료얼음) 컵 붓기','20','','가득','x','쿠키베이스200 식힌샷50','휘핑30 식힌샷 카라멜드리즐','3번'),
+  mk('민트프라페','블렌더(재료얼음액상) 붓기 토핑','20','','가득','우유150','민트베이스파우더5 민트시럽3 초콜릿칩1','휘핑30 딸기분태','3번'),
+  mk('딸기쿠키프라페','블렌더(재료얼음액상) 컵(재료2) 붓기','20','','약간 덜','우유100','쿠키베이스100 / 쿠키분태2 바닥에','휘핑30 쿠키분태','3번'),
+  mk('플레인퐁크러쉬','블렌더(재료얼음액상) 컵(컵밑선 죠리퐁) 붓기 토핑','20','','가득','우유100','쿠키베이스150 죠리퐁1 슈가시럽2','죠리퐁','3번'),
+  mk('바나나퐁크러쉬','블렌더(재료얼음액상) 컵(컵밑선 죠리퐁) 붓기 토핑','20','','가득','우유100','쿠키베이스150 죠리퐁1 슈가시럽2 바나나파우더2','죠리퐁','3번'),
+  mk('딸기퐁크러쉬','블렌더(재료얼음액상) 컵(컵밑선 죠리퐁) 붓기 토핑','20','','가득','우유100','쿠키베이스150 죠리퐁1 딸기소스1','죠리퐁','3번'),
+  mk('초코허니퐁크러쉬','블렌더(재료얼음액상) 컵 붓기 토핑','20','','가득','우유100','쿠키베이스100 죠리퐁1 초코파우더2','음료위 허니퍼프시리얼','3번'),
+ ]},
+{key:'brownSugar', label:'흑당', icon:'🧉',
+ items:[
+  mk('흑당라떼','컵(베이스) 8부선까지·돌리기 얼음액상','20','','가득','우유가득','흑당베이스3',''),
+  mk('흑당밀크티라떼','컵(베이스) 8부선까지·돌리기 시럽 얼음액상','20','','가득','우유가득','흑당베이스2 밀크티시럽2',''),
+  mk('흑당버블라떼','컵(베이스,펄) 8부선까지·돌리기 얼음액상','20','','가득','우유가득','흑당베이스2',''),
+  mk('흑당버블밀크티라떼','컵(베이스,펄) 8부선까지·돌리기 시럽 얼음액상','20','','가득','우유가득','흑당베이스2 밀크티시럽1',''),
+ ]},
+{key:'juice', label:'주스', icon:'🥭',
+ items:[
+  mk('골드키위주스','블렌더(액상,재료) 컵(얼음) 붓기','20','','8부','정수200','골드키위원팩1','','1번'),
+  mk('딸기주스','블렌더(액상,재료) 컵(얼음) 붓기','20','','8부','정수200','딸기원팩1','','1번'),
+  mk('딸기바나나주스','블렌더(액상,재료) 컵(얼음) 붓기','20','','8부','정수100 우유100','딸기바나나원팩1','','1번','바나나가 들어가면 우유 100 사용'),
+ ]},
+{key:'coldBrew', label:'콜드브루', icon:'🥶',
+ items:[
+  mk('콜드브루오리지널(HOT)','비커(재료) 컵 액상','20','','x','온수9부','콜드브루원액100',''),
+  mk('콜드브루라떼(HOT)','비커(재료) 컵 스팀 액상','20','','x','스팀우유250','콜드브루원액100',''),
+  mk('콜드브루오리지널(ICE)','컵(재료) 얼음액상 섞기','20','','가득','정수가득','콜드브루원액 컵밑선',''),
+  mk('콜드브루라떼(ICE)','컵(재료) 얼음액상 섞기','20','','가득','우유가득','콜드브루원액 컵밑선',''),
+ ]},
+{key:'custom', label:'신메뉴', icon:'✨', items:[]},
+];
+
+CATEGORIES.forEach(cat=>{ cat.items.forEach(it=>{ it.id = cat.key+'::'+it.name; it.catKey = cat.key; it.catLabel = cat.label; }); });
+
+// ---- paren-aware tokenizer: splits only on spaces OUTSIDE parentheses ----
+function splitSteps(str){
+  const result=[]; let depth=0, cur='';
+  for(const ch of String(str)){
+    if(ch==='('){ depth++; cur+=ch; }
+    else if(ch===')'){ depth=Math.max(0,depth-1); cur+=ch; }
+    else if(ch===' ' && depth===0){ if(cur){ result.push(cur); cur=''; } }
+    else { cur+=ch; }
+  }
+  if(cur) result.push(cur);
+  return result;
+}
+function fieldKindForToken(tok){
+  if(tok.includes('액상')) return 'liquid';
+  if(tok.includes('재료') || tok.includes('베이스')) return 'ingredient';
+  if(tok.includes('토핑')) return 'topping';
+  return null;
+}
+function parseChunkToPair(chunk){
+  chunk = chunk.trim();
+  if(!chunk || chunk==='x' || chunk==='X' || chunk==='자동') return null;
+  const m = chunk.match(/^(.*?)(\d+(?:\.\d+)?)$/);
+  if(m && m[1].trim()) return {ingredient:m[1].trim(), amount:m[2]};
+  return {ingredient:chunk, amount:''};
+}
+function parseFieldToGroups(field){
+  if(!field) return [];
+  return field.split('/').map(g=> splitSteps(g.trim()).map(parseChunkToPair).filter(Boolean));
+}
+// one-time migration: legacy order/liquid/ingredient/topping strings -> structured steps[{label,skip,pairs}]
+function deriveStepsFromLegacy(it){
+  const toks = splitSteps(it.order);
+  const groupsByKind = { liquid: parseFieldToGroups(it.liquid), ingredient: parseFieldToGroups(it.ingredient), topping: parseFieldToGroups(it.topping) };
+  const occur = {liquid:0, ingredient:0, topping:0};
+  return toks.map(tok=>{
+    const kind = fieldKindForToken(tok);
+    let pairs=[];
+    if(kind){
+      const groups = groupsByKind[kind];
+      const idx = occur[kind]++;
+      pairs = (idx<groups.length ? groups[idx] : groups[groups.length-1]) || [];
+    }
+    return { label: tok, skip: (tok==='추출' || tok==='스팀'), pairs };
+  });
+}
+
+// ---- persistence: edits/additions/deletions layered on top of the legacy data above ----
+const LS_STUDIED='mc_studied_v1', LS_FAV='mc_fav_v1', LS_CATF='mc_catf_v1';
+const LS_OVERRIDES='mc_overrides_v3', LS_DELETED='mc_deleted_v3', LS_CUSTOM='mc_custom_v3';
+function loadSet(key){ try{ return new Set(JSON.parse(localStorage.getItem(key)||'[]')); }catch(e){ return new Set(); } }
+function saveSet(key, set){ try{ localStorage.setItem(key, JSON.stringify([...set])); }catch(e){} }
+function loadJSON(key, fb){ try{ const v=JSON.parse(localStorage.getItem(key)); return v==null?fb:v; }catch(e){ return fb; } }
+function saveJSON(key, v){ try{ localStorage.setItem(key, JSON.stringify(v)); }catch(e){} }
+
+let studied = loadSet(LS_STUDIED);
+let favOverride = loadJSON(LS_FAV, {});
+function saveFav(){ saveJSON(LS_FAV, favOverride); }
+let selectedCats = loadSet(LS_CATF);
+if(selectedCats.size===0){ CATEGORIES.forEach(c=>selectedCats.add(c.key)); }
+
+let overrides = loadJSON(LS_OVERRIDES, {});     // id -> {catKey,name,cup,steps,memo}
+let deletedIds = new Set(loadJSON(LS_DELETED, []));
+let customItems = loadJSON(LS_CUSTOM, []);      // full item objects
+
+const DEFAULT_POPULAR = new Set([
+  'hotCoffee::카페라떼','hotCoffee::카라멜마끼야또','hotCoffee::바닐라라떼',
+  'icedCoffee::아메리카노','icedCoffee::카페라떼(8부)','icedCoffee::바닐라라떼(a선)','icedCoffee::카라멜마끼아또(b선)',
+  'icedTea::복숭아아이스티','ade::자몽에이드','ade::레몬에이드',
+  'icedLatte::딸기라떼','icedLatte::아이스초코','icedLatte::오레오초코라떼',
+  'brownSugar::흑당버블라떼','frappe::리얼초코프라페','frappe::쿠키프라페'
+]);
+
+let ALL_ITEMS = [];
+function rebuildAllItems(){
+  ALL_ITEMS = [];
+  CATEGORIES.forEach(cat=>{
+    cat.items.forEach(it=>{
+      if(deletedIds.has(it.id)) return;
+      if(!it.steps){ it.steps = deriveStepsFromLegacy(it); it.memo = it.tip||''; }
+      const ov = overrides[it.id];
+      const merged = ov ? Object.assign({}, it, ov) : it;
+      merged.id = it.id; merged.catLabel = (CATEGORIES.find(c=>c.key===merged.catKey)||cat).label;
+      ALL_ITEMS.push(merged);
+    });
+  });
+  customItems.forEach(ci=>{
+    if(deletedIds.has(ci.id)) return;
+    const cat = CATEGORIES.find(c=>c.key===ci.catKey) || CATEGORIES.find(c=>c.key==='custom');
+    ALL_ITEMS.push(Object.assign({}, ci, {catLabel: cat.label}));
+  });
+}
+rebuildAllItems();
+
+function isPopular(it){ return favOverride.hasOwnProperty(it.id) ? favOverride[it.id] : DEFAULT_POPULAR.has(it.id); }
+function isStudied(it){ return studied.has(it.id); }
+
+let showUnstudiedOnly=false, showPopularOnly=false;
+let summaryMode=false;      // 요약보기: steps flagged skip=true are hidden/ignored everywhere
+let filterOn=true;          // 문제 탭(객관식/드릴/스피드)에서 목록 필터를 적용할지
+
+function currentPool(){
+  return ALL_ITEMS.filter(it=>{
+    if(!selectedCats.has(it.catKey)) return false;
+    if(showUnstudiedOnly && isStudied(it)) return false;
+    if(showPopularOnly && !isPopular(it)) return false;
+    return true;
+  });
+}
+function quizPool(){ return filterOn ? currentPool() : ALL_ITEMS; }
+
+function visibleSteps(item){ return item.steps.filter(s=> !(summaryMode && s.skip)); }
+function allPairs(item){
+  const out=[];
+  visibleSteps(item).forEach((step,si)=>{ step.pairs.forEach((pair,pi)=>{ out.push({step, pair, si, pi}); }); });
+  return out;
+}
+function amountPairs(item){ return allPairs(item).filter(p=>p.pair.amount!==''); }
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function stepsHtml(item){
+  return visibleSteps(item).map((s,i)=>`<span class="step" data-i="${i+1}">${escapeHtml(s.label)}</span>`).join('');
+}
+function oneLiner(it){
+  const vs = visibleSteps(it);
+  const labels = vs.map(s=>s.label);
+  const short = labels.length>4 ? labels.slice(0,4).join(' → ')+' …' : labels.join(' → ');
+  const firstPair = allPairs(it)[0];
+  return short + (firstPair ? ' · '+firstPair.pair.ingredient+(firstPair.pair.amount?firstPair.pair.amount:'') : '');
+}
+
+// ---- tabs ----
+const tabButtons = document.querySelectorAll('nav.tabs button');
+tabButtons.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    tabButtons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='card') renderCard();
+    if(btn.dataset.tab==='drill') drillEnsure();
+    if(btn.dataset.tab==='speed') newSpeedQuestion();
+  });
+});
+
+// ---- category filter bar ----
+function renderCatFilterBar(){
+  const bar=document.getElementById('catFilterBar');
+  bar.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    const chip=document.createElement('span');
+    chip.className='chip'+(selectedCats.has(cat.key)?' on':'');
+    chip.textContent=cat.icon+' '+cat.label;
+    chip.addEventListener('click', ()=>{
+      if(selectedCats.has(cat.key)) selectedCats.delete(cat.key); else selectedCats.add(cat.key);
+      saveSet(LS_CATF, selectedCats);
+      renderCatFilterBar(); renderList();
+    });
+    bar.appendChild(chip);
+  });
+}
+document.getElementById('selAll').addEventListener('click', ()=>{ CATEGORIES.forEach(c=>selectedCats.add(c.key)); saveSet(LS_CATF, selectedCats); renderCatFilterBar(); renderList(); });
+document.getElementById('selNone').addEventListener('click', ()=>{ selectedCats.clear(); saveSet(LS_CATF, selectedCats); renderCatFilterBar(); renderList(); });
+document.getElementById('fltUnstudied').addEventListener('click', function(){ showUnstudiedOnly=!showUnstudiedOnly; this.classList.toggle('on', showUnstudiedOnly); renderList(); });
+document.getElementById('fltPopular').addEventListener('click', function(){ showPopularOnly=!showPopularOnly; this.classList.toggle('on', showPopularOnly); renderList(); });
+document.getElementById('resetDone').addEventListener('click', ()=>{ if(confirm('외운 표시를 모두 초기화할까요?')){ studied.clear(); saveSet(LS_STUDIED, studied); renderList(); } });
+
+// ---- step-mode segmented toggle ----
+document.querySelectorAll('#stepModeSeg button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#stepModeSeg button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); summaryMode = (b.dataset.stepmode==='summary');
+    refreshAllViews();
+  });
+});
+
+// ---- filter-on/off toggle (문제 탭 상단) ----
+function syncFilterToggleUI(){
+  document.querySelectorAll('.filtertoggle').forEach(b=>{
+    b.textContent = filterOn ? '✅ 목록 필터 적용중' : '⬜ 전체 메뉴 (필터 무시)';
+    b.classList.toggle('on', filterOn);
+  });
+}
+document.querySelectorAll('.filtertoggle').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    filterOn = !filterOn; syncFilterToggleUI();
+    const t = document.querySelector('nav.tabs button.active');
+    const tab = t? t.dataset.tab : '';
+    if(tab==='drill') startDrillSession();
+    if(tab==='speed') newSpeedQuestion();
+  });
+});
+function refreshAllViews(){
+  renderList();
+  const t = document.querySelector('nav.tabs button.active');
+  const tab = t? t.dataset.tab : 'list';
+  if(tab==='card') renderCard();
+  if(tab==='drill') startDrillSession();
+  if(tab==='speed') newSpeedQuestion();
+}
+
+// ======================= LIST =======================
+function renderList(){
+  const root=document.getElementById('listRoot');
+  root.innerHTML='';
+  const pool = currentPool();
+  let shown=0, doneN=0;
+  ALL_ITEMS.forEach(it=>{ if(isStudied(it)) doneN++; });
+
+  CATEGORIES.forEach(cat=>{
+    if(!selectedCats.has(cat.key)) return;
+    const items = pool.filter(it=>it.catKey===cat.key);
+    if(items.length===0) return;
+    shown += items.length;
+    const block=document.createElement('div');
+    block.className='cat-block';
+    block.innerHTML = `<div class="cat-head">${cat.icon} ${cat.label} <span class="n">(${items.length})</span></div>`;
+
+    items.forEach(it=>{
+      const done=isStudied(it), pop=isPopular(it);
+      const el=document.createElement('div');
+      el.className='item'+(done?' done':'');
+      el.innerHTML = `
+        <div class="item-head">
+          <span class="star ${pop?'on':''}" title="인기메뉴 표시">★</span>
+          <div class="namewrap">
+            <span class="name">${escapeHtml(it.name)}</span>
+            <span class="oneliner">${escapeHtml(oneLiner(it))}</span>
+          </div>
+          ${it.cup?`<span class="cup">${it.cup}oz</span>`:''}
+          <button class="iconbtn editbtn">✏️</button>
+          <button class="iconbtn donebtn ${done?'on':''}">${done?'✓':'완료'}</button>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="item-body">
+          <div class="steps">${visibleSteps(it).map((s,i)=>`<span class="step" data-i="${i+1}">${escapeHtml(s.label)}</span>`).join('')}</div>
+          ${allPairs(it).map(p=>`<div class="kv"><b>${escapeHtml(p.step.label)}</b><span>${escapeHtml(p.pair.ingredient)}${p.pair.amount?(' '+p.pair.amount):''}</span></div>`).join('')}
+          ${it.memo?`<div class="memo">📝 ${escapeHtml(it.memo)}</div>`:''}
+        </div>`;
+      el.querySelector('.star').addEventListener('click', (e)=>{ e.stopPropagation(); favOverride[it.id]=!isPopular(it); saveFav(); renderList(); });
+      el.querySelector('.donebtn').addEventListener('click', (e)=>{ e.stopPropagation(); if(studied.has(it.id)) studied.delete(it.id); else studied.add(it.id); saveSet(LS_STUDIED, studied); renderList(); });
+      el.querySelector('.editbtn').addEventListener('click', (e)=>{ e.stopPropagation(); openItemForm(it); });
+      el.querySelector('.item-head').addEventListener('click', (e)=>{
+        if(e.target.closest('.editbtn')||e.target.closest('.donebtn')||e.target.closest('.star')) return;
+        el.querySelector('.item-body').classList.toggle('open');
+        el.querySelector('.arrow').textContent = el.querySelector('.item-body').classList.contains('open') ? '▲' : '▼';
+      });
+      block.appendChild(el);
+    });
+    root.appendChild(block);
+  });
+  if(shown===0) root.innerHTML = '<div class="empty">조건에 맞는 메뉴가 없어요.<br>카테고리나 필터를 조정해보세요.</div>';
+  document.getElementById('listCount').textContent = shown;
+  document.getElementById('doneCount').textContent = doneN;
+}
+
+// ---- item add/edit form ----
+let draftSteps=[];
+function openItemForm(item){
+  const host = document.getElementById('itemFormHost');
+  const isNew = !item;
+  draftSteps = item ? JSON.parse(JSON.stringify(item.steps)) : [];
+  const isCustom = item && customItems.some(c=>c.id===item.id);
+  host.innerHTML = `
+    <div class="editbox" id="itemForm">
+      <h3>${isNew?'➕ 새 메뉴 추가':'✏️ 메뉴 수정'}</h3>
+      <div class="field"><label>카테고리</label>
+        <select id="f_cat">${CATEGORIES.map(c=>`<option value="${c.key}" ${item&&item.catKey===c.key?'selected':''}>${c.icon} ${c.label}</option>`).join('')}</select>
+      </div>
+      <div class="field"><label>이름</label><input id="f_name" value="${item?escapeHtml(item.name):''}"></div>
+      <div class="field"><label>컵 사이즈 (oz)</label><input id="f_cup" value="${item?escapeHtml(item.cup):''}"></div>
+      <div class="field"><label>제조과정 (단계별 텍스트 + 해당 재료/양). 색이 채워진 단계는 요약보기에도 나오고, 클릭해서 색을 빼면 요약보기에서 생략됩니다.</label>
+        <div id="stepRows"></div>
+        <button type="button" class="tinybtn" id="addStepBtn">➕ 과정 추가</button>
+      </div>
+      <div class="field"><label>메모</label><textarea id="f_memo">${item?escapeHtml(item.memo||''):''}</textarea></div>
+      <div class="btnrow">
+        <button class="btn primary" id="formSave">저장</button>
+        <button class="btn ghost" id="formCancel">취소</button>
+        ${item?'<button class="btn warn" id="formDelete">🗑️ 이 메뉴 삭제</button>':''}
+      </div>
+    </div>`;
+  renderStepRows();
+  document.getElementById('addStepBtn').addEventListener('click', ()=>{ draftSteps.push({label:'', skip:false, pairs:[]}); renderStepRows(); });
+  document.getElementById('formCancel').addEventListener('click', ()=>{ host.innerHTML=''; });
+  document.getElementById('formSave').addEventListener('click', ()=>{
+    const name=document.getElementById('f_name').value.trim();
+    if(!name){ alert('이름을 입력해주세요.'); return; }
+    const data = {
+      catKey: document.getElementById('f_cat').value,
+      name, cup: document.getElementById('f_cup').value.trim(),
+      steps: draftSteps.map(s=>({label:s.label.trim()||'(단계)', skip:!!s.skip, pairs:s.pairs.filter(p=>p.ingredient.trim()).map(p=>({ingredient:p.ingredient.trim(), amount:p.amount.trim()}))})),
+      memo: document.getElementById('f_memo').value.trim(),
+    };
+    if(isNew){
+      data.id = 'custom::'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+      customItems.push(data);
+    } else if(isCustom){
+      const idx=customItems.findIndex(c=>c.id===item.id);
+      customItems[idx] = Object.assign({}, customItems[idx], data);
+    } else {
+      overrides[item.id] = Object.assign({}, overrides[item.id], data);
+      saveJSON(LS_OVERRIDES, overrides);
+    }
+    saveJSON(LS_CUSTOM, customItems);
+    rebuildAllItems();
+    host.innerHTML='';
+    renderList();
+  });
+  if(item){
+    document.getElementById('formDelete').addEventListener('click', ()=>{
+      if(!confirm(`"${item.name}" 메뉴를 삭제할까요?`)) return;
+      if(isCustom){ customItems = customItems.filter(c=>c.id!==item.id); saveJSON(LS_CUSTOM, customItems); }
+      else { deletedIds.add(item.id); saveJSON(LS_DELETED, [...deletedIds]); }
+      rebuildAllItems();
+      host.innerHTML='';
+      renderList();
+    });
+  }
+  host.scrollIntoView({behavior:'smooth'});
+}
+function renderStepRows(){
+  const root=document.getElementById('stepRows');
+  root.innerHTML='';
+  draftSteps.forEach((step, si)=>{
+    const row=document.createElement('div');
+    row.className='steprow';
+    row.innerHTML = `
+      <div class="steprow-top">
+        <button type="button" class="skiptoggle ${step.skip?'skipped':'included'}">${step.skip?'요약에서 생략':'요약에도 포함'}</button>
+        <input placeholder="예: 컵(재료)" value="${escapeHtml(step.label)}">
+        <button type="button" class="tinybtn danger">✕</button>
+      </div>
+      <div class="pairsHost"></div>
+      <button type="button" class="tinybtn">➕ 재료/양 추가</button>`;
+    const labelInput = row.querySelector('.steprow-top input');
+    labelInput.addEventListener('input', ()=>{ step.label=labelInput.value; });
+    row.querySelector('.skiptoggle').addEventListener('click', (e)=>{ step.skip=!step.skip; e.target.textContent = step.skip?'요약에서 생략':'요약에도 포함'; e.target.className='skiptoggle '+(step.skip?'skipped':'included'); });
+    row.querySelector('.tinybtn.danger').addEventListener('click', ()=>{ draftSteps.splice(si,1); renderStepRows(); });
+    row.querySelector(':scope > .tinybtn:not(.danger)').addEventListener('click', ()=>{ step.pairs.push({ingredient:'',amount:''}); renderPairRows(step, row.querySelector('.pairsHost')); });
+    renderPairRows(step, row.querySelector('.pairsHost'));
+    root.appendChild(row);
+  });
+}
+function renderPairRows(step, host){
+  host.innerHTML='';
+  step.pairs.forEach((pair, pi)=>{
+    const pr=document.createElement('div');
+    pr.className='pairrow';
+    pr.innerHTML = `<input placeholder="재료명" value="${escapeHtml(pair.ingredient)}"><input placeholder="양(선택)" value="${escapeHtml(pair.amount)}" style="max-width:90px;"><button type="button" class="tinybtn danger">✕</button>`;
+    const [ing,amt]=pr.querySelectorAll('input');
+    ing.addEventListener('input', ()=>{ pair.ingredient=ing.value; });
+    amt.addEventListener('input', ()=>{ pair.amount=amt.value; });
+    pr.querySelector('.tinybtn').addEventListener('click', ()=>{ step.pairs.splice(pi,1); renderPairRows(step, host); });
+    host.appendChild(pr);
+  });
+}
+document.getElementById('addItemBtn').addEventListener('click', ()=>openItemForm(null));
+
+// ======================= CARD (공부) =======================
+let cardPool=[], cardIdx=0, cardFlipped=false;
+function renderCard(){
+  cardPool = currentPool();
+  if(cardPool.length===0){ cardIdx=0; } else if(cardIdx>=cardPool.length) cardIdx=0;
+  document.getElementById('cardFilterInfo').innerHTML = `<span class="chip on">${selectedCats.size===CATEGORIES.length?'전체':selectedCats.size+'개 카테고리'} · ${cardPool.length}개 카드</span>`;
+  showCardFace();
+}
+function showCardFace(){
+  cardFlipped=false;
+  document.getElementById('cardBack').classList.remove('show');
+  document.getElementById('cardFront').classList.remove('hide');
+  const total=cardPool.length;
+  document.getElementById('cardProgress').textContent = total? `${cardIdx+1} / ${total}` : '카드 없음';
+  if(total===0){ document.getElementById('cardCat').textContent=''; document.getElementById('cardName').textContent='표시할 카드가 없어요'; document.getElementById('cardCup').textContent=''; return; }
+  const it=cardPool[cardIdx];
+  document.getElementById('cardCat').textContent = it.catLabel + (isPopular(it)?' · ⭐인기':'');
+  document.getElementById('cardName').textContent = it.name;
+  document.getElementById('cardCup').textContent = it.cup? it.cup+'oz' : '';
+}
+function flipCard(){
+  if(cardPool.length===0) return;
+  cardFlipped=!cardFlipped;
+  const it=cardPool[cardIdx];
+  if(cardFlipped){
+    document.getElementById('cardFront').classList.add('hide');
+    const back=document.getElementById('cardBack');
+    back.classList.add('show');
+    back.innerHTML = `
+      <div style="font-weight:700;font-size:14px;margin-bottom:6px;">${escapeHtml(it.name)}</div>
+      <div class="steps">${stepsHtml(it)}</div>
+      ${allPairs(it).map(p=>`<div class="kv"><b>${escapeHtml(p.step.label)}</b><span>${escapeHtml(p.pair.ingredient)}${p.pair.amount?(' '+p.pair.amount):''}</span></div>`).join('')}
+      ${it.memo?`<div class="memo">📝 ${escapeHtml(it.memo)}</div>`:''}`;
+  } else {
+    document.getElementById('cardFront').classList.remove('hide');
+    document.getElementById('cardBack').classList.remove('show');
+  }
+}
+document.getElementById('flipCard').addEventListener('click', flipCard);
+document.getElementById('cardNext').addEventListener('click', ()=>{ if(cardPool.length===0)return; cardIdx=(cardIdx+1)%cardPool.length; showCardFace(); });
+document.getElementById('cardShuffle').addEventListener('click', ()=>{
+  for(let i=cardPool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [cardPool[i],cardPool[j]]=[cardPool[j],cardPool[i]]; }
+  cardIdx=0; showCardFace();
+});
+document.getElementById('cardRight').addEventListener('click', ()=>{
+  if(cardPool.length===0) return;
+  studied.add(cardPool[cardIdx].id); saveSet(LS_STUDIED, studied);
+  cardIdx=(cardIdx+1)%cardPool.length;
+  if(showUnstudiedOnly) renderCard(); else showCardFace();
+});
+
+// ======================= shared quiz engine (문제 3유형: ingredient/amount/order) =======================
+function pickUnique(correctVal, candidates, n){
+  const seen=new Set(); const out=[];
+  for(const c of candidates){ if(c===correctVal||c===''||seen.has(c)) continue; seen.add(c); out.push(c); if(out.length>=n) break; }
+  return out;
+}
+function poolForItem(item){
+  const same = ALL_ITEMS.filter(x=>x.id!==item.id && x.catKey===item.catKey);
+  return same.length ? same : ALL_ITEMS.filter(x=>x.id!==item.id);
+}
+function ingredientDistractors(item, correct, n){
+  let vals=[]; poolForItem(item).forEach(x=>allPairs(x).forEach(p=>vals.push(p.pair.ingredient)));
+  let out = pickUnique(correct, [...new Set(vals)].sort(()=>Math.random()-0.5), n);
+  if(out.length<n){ vals=[]; ALL_ITEMS.forEach(x=>{ if(x.id!==item.id) allPairs(x).forEach(p=>vals.push(p.pair.ingredient)); }); out = pickUnique(correct, [...new Set(vals)].sort(()=>Math.random()-0.5), n); }
+  return out;
+}
+function amountDistractors(item, correct, n){
+  let vals=[]; poolForItem(item).forEach(x=>amountPairs(x).forEach(p=>vals.push(p.pair.amount)));
+  let out = pickUnique(correct, [...new Set(vals)].sort(()=>Math.random()-0.5), n);
+  if(out.length<n){ vals=[]; ALL_ITEMS.forEach(x=>{ if(x.id!==item.id) amountPairs(x).forEach(p=>vals.push(p.pair.amount)); }); out = pickUnique(correct, [...new Set(vals)].sort(()=>Math.random()-0.5), n); }
+  return out;
+}
+function orderDistractors(item, correct, n){
+  let vals=[]; poolForItem(item).forEach(x=>visibleSteps(x).forEach(s=>vals.push(s.label)));
+  let out = pickUnique(correct, [...new Set(vals)].sort(()=>Math.random()-0.5), n);
+  if(out.length<n){ vals=[]; ALL_ITEMS.forEach(x=>{ if(x.id!==item.id) visibleSteps(x).forEach(s=>vals.push(s.label)); }); out = pickUnique(correct, [...new Set(vals)].sort(()=>Math.random()-0.5), n); }
+  return out;
+}
+function unitsFor(item, qType){
+  if(qType==='order') return visibleSteps(item).map((s,i)=>({kind:'order', si:i, correct:s.label}));
+  if(qType==='amount') return amountPairs(item).map(p=>({kind:'amount', si:p.si, pi:p.pi, correct:p.pair.amount}));
+  return allPairs(item).map(p=>({kind:'ingredient', si:p.si, pi:p.pi, correct:p.pair.ingredient}));
+}
+function distractorsFor(item, qType, correct){
+  if(qType==='order') return orderDistractors(item, correct, 3);
+  if(qType==='amount') return amountDistractors(item, correct, 3);
+  return ingredientDistractors(item, correct, 3);
+}
+function promptFor(qType){
+  if(qType==='order') return '다음 단계는?';
+  if(qType==='amount') return '이 재료의 양은?';
+  return '이 자리의 재료는?';
+}
+// renders the item's full step/pair structure, masking exactly one unit (fill-in-the-blank).
+// solvedUpTo==='all' -> everything except the current unit is revealed (객관식/스피드: one blank at a time).
+// solvedUpTo is a number -> only units before that index are revealed, later ones stay hidden (드릴: builds up sequentially).
+function isUnitSolved(idx, currentIdx, solvedUpTo){
+  if(idx===currentIdx) return false;
+  return solvedUpTo==='all' ? true : idx < solvedUpTo;
+}
+// top row: step labels only ("과정만 표시") — for order mode this row IS the quiz (masked per solvedUpTo);
+// for ingredient/amount modes it's always fully revealed context, numbered 1./2./3... via data-i (never a bare "?" without its number).
+function renderStepsRow(item, currentIdx, solvedUpTo, resultMark){
+  const vs = visibleSteps(item);
+  return vs.map((step,i)=>{
+    const num = i+1;
+    if(currentIdx==null) return `<span class="step" data-i="${num}">${escapeHtml(step.label)}</span>`;
+    const isCurrent = i===currentIdx;
+    const solved = isUnitSolved(i, currentIdx, solvedUpTo);
+    if(isCurrent && resultMark==='ok') return `<span class="step" data-i="${num}" style="background:var(--good-soft);color:var(--good);">${escapeHtml(step.label)}</span>`;
+    if(isCurrent && resultMark==='bad') return `<span class="step" data-i="${num}" style="background:var(--bad-soft);color:var(--bad);">정답: ${escapeHtml(step.label)}</span>`;
+    if(solved) return `<span class="step" data-i="${num}">${escapeHtml(step.label)}</span>`;
+    if(isCurrent) return `<span class="step" data-i="${num}" style="background:var(--caramel-soft);color:#8a4d19;">?</span>`;
+    return `<span class="step" data-i="${num}" style="opacity:.35;">?</span>`;
+  }).join('');
+}
+// below the steps row, like the 목록 item body: "단계명 — 재료 양" rows, with the tested slot's
+// ingredient (재료맞추기) or amount (양맞추기) replaced by ??? until answered
+function renderPairKvRows(item, qType, currentUnitIdx, solvedUpTo, resultMark){
+  const vs = visibleSteps(item);
+  let pairCounter=0, amtCounter=0;
+  const rows=[];
+  vs.forEach(step=>{
+    step.pairs.forEach(pair=>{
+      if(qType==='ingredient'){
+        const myIdx=pairCounter++;
+        const isCurrent = myIdx===currentUnitIdx;
+        const solved = isUnitSolved(myIdx, currentUnitIdx, solvedUpTo);
+        let val;
+        if(isCurrent && resultMark==='ok') val = `<b style="color:var(--good);">${escapeHtml(pair.ingredient)}${pair.amount?(' '+pair.amount):''}</b>`;
+        else if(isCurrent && resultMark==='bad') val = `<b style="color:var(--bad);">정답: ${escapeHtml(pair.ingredient)}${pair.amount?(' '+pair.amount):''}</b>`;
+        else if(solved) val = `${escapeHtml(pair.ingredient)}${pair.amount?(' '+pair.amount):''}`;
+        else val = `<span style="color:var(--caramel);font-weight:700;">???</span>`;
+        rows.push(`<div class="kv"><b>${escapeHtml(step.label)}</b><span>${val}</span></div>`);
+      } else if(qType==='amount'){
+        if(pair.amount===''){ rows.push(`<div class="kv"><b>${escapeHtml(step.label)}</b><span>${escapeHtml(pair.ingredient)}</span></div>`); return; }
+        const myIdx=amtCounter++;
+        const isCurrent = myIdx===currentUnitIdx;
+        const solved = isUnitSolved(myIdx, currentUnitIdx, solvedUpTo);
+        let val;
+        if(isCurrent && resultMark==='ok') val = `${escapeHtml(pair.ingredient)} <b style="color:var(--good);">${pair.amount}</b>`;
+        else if(isCurrent && resultMark==='bad') val = `${escapeHtml(pair.ingredient)} <b style="color:var(--bad);">정답: ${pair.amount}</b>`;
+        else if(solved) val = `${escapeHtml(pair.ingredient)} ${pair.amount}`;
+        else val = `${escapeHtml(pair.ingredient)} <span style="color:var(--caramel);font-weight:700;">???</span>`;
+        rows.push(`<div class="kv"><b>${escapeHtml(step.label)}</b><span>${val}</span></div>`);
+      }
+    });
+  });
+  return rows.join('');
+}
+// combines the two: order mode masks the steps row itself; ingredient/amount mode shows the full
+// process (unmasked) plus the kv rows below with exactly one ingredient/amount slot masked
+function renderQuestionBlock(item, qType, currentUnitIdx, units, solvedUpTo, resultMark){
+  if(qType==='order'){
+    return `<div class="steps" style="justify-content:center;margin-top:10px;">${renderStepsRow(item, currentUnitIdx, solvedUpTo, resultMark)}</div>`;
+  }
+  const stepsRow = renderStepsRow(item, null, solvedUpTo, null);
+  const kv = renderPairKvRows(item, qType, currentUnitIdx, solvedUpTo, resultMark);
+  return `<div class="steps" style="justify-content:center;margin-top:10px;">${stepsRow}</div><div style="margin-top:8px;text-align:left;">${kv}</div>`;
+}
+
+// ======================= 드릴 (객관식/하나만/전체) =======================
+let drillQType='ingredient', drillRunMode='mc', drillScore={c:0,t:0};
+let drillQueue=[], drillQueueIdx=0, drillItem=null, drillUnits=[], drillUnitIdx=0;
+let drillPhase='question', drillLastCorrect=false, drillPendingFn=null, drillAutoTimer=null;
+function clearDrillAutoTimer(){ if(drillAutoTimer){ clearTimeout(drillAutoTimer); drillAutoTimer=null; } }
+document.querySelectorAll('#drillQBar button').forEach(b=>{
+  b.addEventListener('click', ()=>{ document.querySelectorAll('#drillQBar button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); drillQType=b.dataset.qtype; drillScore={c:0,t:0}; startDrillSession(); });
+});
+document.querySelectorAll('#drillRunBar button').forEach(b=>{
+  b.addEventListener('click', ()=>{ document.querySelectorAll('#drillRunBar button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); drillRunMode=b.dataset.drillrun; drillScore={c:0,t:0}; startDrillSession(); });
+});
+function loadDrillItem(item){
+  drillItem=item; drillUnits=unitsFor(item, drillQType); drillUnitIdx=0;
+  drillPhase='question'; drillPendingFn=null;
+  renderDrillQuestion();
+}
+// 연습문제/하나만 드릴 모두 "메뉴 하나를 골라 처음부터 순서대로" 진행한다 — 차이는 오답 처리뿐(answerDrill에서 분기)
+function startDrillSession(){
+  clearDrillAutoTimer();
+  const pool = quizPool().filter(it=>unitsFor(it, drillQType).length>0);
+  document.getElementById('drillMsg').style.display='none';
+  if(pool.length===0){
+    drillItem=null;
+    document.getElementById('drillQuestion').innerHTML = '<div class="empty">이 유형으로 낼 수 있는 메뉴가 없어요.<br>필터나 유형을 조정해보세요.</div>';
+    document.getElementById('drillOptions').innerHTML=''; document.getElementById('drillStatus').textContent='';
+    const nb=document.getElementById('drillNext'); nb.disabled=true; nb.style.display='none';
+    return;
+  }
+  if(drillRunMode==='all'){ drillQueue = pool.slice().sort(()=>Math.random()-0.5); drillQueueIdx=0; loadDrillItem(drillQueue[0]); }
+  else loadDrillItem(pool[Math.floor(Math.random()*pool.length)]); // 'mc' and 'one' both just start with a fresh random single item
+}
+function drillEnsure(){ drillItem ? renderDrillQuestion() : startDrillSession(); }
+function drillHeader(){
+  const it=drillItem;
+  const resultMark = drillPhase==='result' ? (drillLastCorrect?'ok':'bad') : null;
+  const block = renderQuestionBlock(it, drillQType, drillUnitIdx, drillUnits, drillUnitIdx, resultMark);
+  let prompt;
+  if(drillPhase==='result') prompt = drillLastCorrect ? '정답 확인!' : (drillRunMode==='mc' ? '오답 확인 — 다음 단계로 계속 진행됩니다' : '오답 확인 — 처음으로 리셋됩니다');
+  else prompt = promptFor(drillQType);
+  const scoreLine = drillRunMode==='mc' ? `<div class="score" style="margin:0 0 4px;">${drillScore.c} / ${drillScore.t}</div>` : '';
+  return `${scoreLine}<div class="qname">${escapeHtml(it.name)}</div><div class="qcup">${it.cup}oz</div>${block}<div class="qprompt">${prompt}</div>`;
+}
+function renderDrillQuestion(){
+  clearDrillAutoTimer();
+  drillPhase='question'; drillPendingFn=null;
+  document.getElementById('drillMsg').style.display='none';
+  const nb=document.getElementById('drillNext'); nb.style.display='none'; nb.disabled=true;
+  if(!drillItem) return;
+  const posText = drillRunMode==='all' ? ` · ${drillQueueIdx+1}/${drillQueue.length}번째 메뉴` : '';
+  document.getElementById('drillStatus').textContent = `${drillItem.catLabel}${posText}`;
+  document.getElementById('drillQuestion').innerHTML = drillHeader();
+  const unit = drillUnits[drillUnitIdx];
+  const distractors = distractorsFor(drillItem, drillQType, unit.correct);
+  const optRoot=document.getElementById('drillOptions'); optRoot.innerHTML='';
+  [unit.correct, ...distractors].sort(()=>Math.random()-0.5).forEach(val=>{
+    const b=document.createElement('button'); b.className='opt'; b.dataset.val=val; b.textContent=val;
+    b.addEventListener('click', ()=>answerDrill(b, val, unit.correct));
+    optRoot.appendChild(b);
+  });
+}
+function advanceAfterClear(){
+  if(drillRunMode==='all'){
+    drillQueueIdx++;
+    if(drillQueueIdx>=drillQueue.length) startDrillSession();
+    else loadDrillItem(drillQueue[drillQueueIdx]);
+  } else {
+    startDrillSession(); // 'mc' and 'one' both just move on to a fresh random single item
+  }
+}
+function runDrillPending(){ if(drillPendingFn){ const fn=drillPendingFn; drillPendingFn=null; fn(); } }
+function answerDrill(btn, value, correctVal){
+  clearDrillAutoTimer();
+  const opts=[...document.querySelectorAll('#drillOptions .opt')]; opts.forEach(o=>o.classList.add('disabled'));
+  drillPhase='result'; drillLastCorrect=(value===correctVal);
+  const msgEl=document.getElementById('drillMsg'); msgEl.style.display='block';
+  const nextBtn=document.getElementById('drillNext');
+  if(drillRunMode==='mc') drillScore.t++;
+
+  if(drillLastCorrect){
+    btn.classList.add('correct');
+    if(drillRunMode==='mc') drillScore.c++;
+    const clearing = (drillUnitIdx+1>=drillUnits.length);
+    msgEl.className='drillmsg ok';
+    msgEl.textContent = clearing ? `🎉 "${drillItem.name}" 클리어! 다음 메뉴로 넘어가려면 아래 버튼을 눌러주세요.` : '✅ 정답! 잠시 후 다음 단계로 넘어갑니다…';
+    drillPendingFn = ()=>{ drillUnitIdx++; if(drillUnitIdx>=drillUnits.length) advanceAfterClear(); else renderDrillQuestion(); };
+    if(clearing){ nextBtn.style.display=''; nextBtn.disabled=false; }
+    else { nextBtn.style.display='none'; drillAutoTimer=setTimeout(runDrillPending, 700); }
+  } else {
+    btn.classList.add('wrong');
+    const cb=opts.find(o=>o.dataset.val===correctVal); if(cb) cb.classList.add('correct');
+    msgEl.className='drillmsg bad';
+    if(drillRunMode==='mc'){
+      // 연습문제: 틀려도 리셋 없이 정답만 확인하고 계속 다음 단계로 진행
+      const clearing = (drillUnitIdx+1>=drillUnits.length);
+      msgEl.textContent = clearing ? `❌ 오답! 정답을 확인했어요. "${drillItem.name}" 다음 메뉴로 넘어가려면 아래 버튼을 눌러주세요.` : '❌ 오답! 정답을 확인하고 다음 단계로 넘어갑니다…';
+      drillPendingFn = ()=>{ drillUnitIdx++; if(drillUnitIdx>=drillUnits.length) advanceAfterClear(); else renderDrillQuestion(); };
+      if(clearing){ nextBtn.style.display=''; nextBtn.disabled=false; }
+      else { nextBtn.style.display='none'; drillAutoTimer=setTimeout(runDrillPending, 1200); }
+    } else {
+      msgEl.textContent = drillRunMode==='all' ? '❌ 틀렸어요! 전체 드릴 1번째 메뉴부터 다시 시작합니다…' : `❌ 틀렸어요! "${drillItem.name}" 1번 문제부터 다시 시작합니다…`;
+      drillPendingFn = ()=>{ if(drillRunMode==='all'){ drillQueueIdx=0; loadDrillItem(drillQueue[0]); } else loadDrillItem(drillItem); };
+      nextBtn.style.display='none'; drillAutoTimer=setTimeout(runDrillPending, 1400);
+    }
+  }
+  document.getElementById('drillQuestion').innerHTML = drillHeader();
+}
+document.getElementById('drillNext').addEventListener('click', runDrillPending);
+
+// ======================= 스피드 (메뉴당 질문 1개, 나머지는 다 채워진 상태) =======================
+let speedScore={c:0,t:0}, speedCurrent=null;
+const QTYPES=['ingredient','amount','order'];
+function newSpeedQuestion(){
+  const pool=quizPool();
+  if(pool.length===0){ document.getElementById('speedQuestion').innerHTML='<div class="empty">조건에 맞는 메뉴가 없어요.</div>'; document.getElementById('speedOptions').innerHTML=''; return; }
+  let item, qType, units, tries=0;
+  do{
+    item = pool[Math.floor(Math.random()*pool.length)];
+    qType = QTYPES[Math.floor(Math.random()*QTYPES.length)];
+    units = unitsFor(item, qType);
+    tries++;
+  } while(units.length===0 && tries<15);
+  if(units.length===0){ document.getElementById('speedQuestion').innerHTML='<div class="empty">질문을 만들 수 없어요. 다음 문제를 눌러보세요.</div>'; document.getElementById('speedOptions').innerHTML=''; return; }
+  const unitIdx = Math.floor(Math.random()*units.length);
+  const unit = units[unitIdx];
+  speedCurrent = {item, qType, unit};
+  const block = renderQuestionBlock(item, qType, unitIdx, units, 'all', null);
+  document.getElementById('speedQuestion').innerHTML = `
+    <div class="qcat">${item.catLabel}${isPopular(item)?' · ⭐인기':''}</div>
+    <div class="qname">${escapeHtml(item.name)}</div>${block}
+    <div class="qprompt">${promptFor(qType)}</div>`;
+  const distractors = distractorsFor(item, qType, unit.correct);
+  const optRoot=document.getElementById('speedOptions'); optRoot.innerHTML='';
+  [unit.correct, ...distractors].sort(()=>Math.random()-0.5).forEach(val=>{
+    const b=document.createElement('button'); b.className='opt'; b.dataset.val=val; b.textContent=val;
+    b.addEventListener('click', ()=>answerSpeed(b, val));
+    optRoot.appendChild(b);
+  });
+  updateSpeedScore();
+}
+function updateSpeedScore(){ document.getElementById('speedScore').textContent = `${speedScore.c} / ${speedScore.t}`; }
+function answerSpeed(btn, val){
+  const opts=[...document.querySelectorAll('#speedOptions .opt')]; opts.forEach(o=>o.classList.add('disabled'));
+  speedScore.t++;
+  if(val===speedCurrent.unit.correct){ btn.classList.add('correct'); speedScore.c++; }
+  else { btn.classList.add('wrong'); const cb=opts.find(o=>o.dataset.val===speedCurrent.unit.correct); if(cb) cb.classList.add('correct'); }
+  updateSpeedScore();
+}
+document.getElementById('speedNext').addEventListener('click', newSpeedQuestion);
+
+// ---- init ----
+syncFilterToggleUI();
+renderCatFilterBar();
+renderList();
+})();
+</script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+  }
+</script>
+</body>
+</html>
